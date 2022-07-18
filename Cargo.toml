@@ -9,3 +9,4 @@ license-file = "LICENSE"
 
 [dependencies]
 clap = { version = "3.2.12", features = ["derive"] }
+colored = "2.0.0"

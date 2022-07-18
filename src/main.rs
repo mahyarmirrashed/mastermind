@@ -1,4 +1,5 @@
 use clap::Parser;
+use colored::Colorize;
 
 /// Mastermind is a game where the codebreaker tries to guess the pattern in both order and color.
 #[derive(Parser, Debug)]
@@ -17,4 +18,11 @@ fn main() {
     let args = Args::parse();
 
     println!("Number of turns: {}.", args.turns);
+    println!(
+        "{}",
+        "This text is red, underlined, and bolded."
+            .red()
+            .underline()
+            .bold()
+    );
 }
