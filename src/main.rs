@@ -7,9 +7,9 @@ use colored::Colorize;
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
 struct Args {
-    /// Number of holes to guess each turn
+    /// Number of color code pegs to guess each turn
     #[clap(short, long, value_parser = clap::value_parser!(i8).range(3..=6), default_value_t = 4)]
-    holes: i8,
+    pegs: i8,
 
     /// Number of turns before game ends
     #[clap(short, long, value_parser = clap::value_parser!(i8).range(8..=12), default_value_t = 10)]
