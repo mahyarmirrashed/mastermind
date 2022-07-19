@@ -1,12 +1,5 @@
 use std::collections::HashMap;
 
-/// Color code pegs for hole guessing (will be colored)
-const COLOR_PEG: &str = "\u{2b24}";
-/// White key peg for correct color code peg placed in wrong position
-const RCWP_PEG: &str = "\u{25cf}";
-/// Black key peg for correct color code peg placed in correct position
-const RCRP_PEG: &str = "\u{25e6}";
-
 /// Subset of the standard eight ANSI colors
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
 pub enum Color {
