@@ -70,4 +70,14 @@ impl Feedback {
 
         Ok(Feedback { wrong, right })
     }
+
+    /// Getter for wrong field (immutable access).
+    pub fn wrong(&self) -> &u8 {
+        &self.wrong
+    }
+
+    /// Getter for right field (immutable access).
+    pub fn right(&self) -> &u8 {
+        &self.right
+    }
 }
