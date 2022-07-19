@@ -15,10 +15,10 @@ pub enum Color {
 /// Feedback provided to codebreaker by codemaker
 pub struct Feedback {
     /// Number of correct color code pegs in wrong position
-    wrong: u8,
+    wrong: usize,
 
     /// Number of correct color code pegs in right position
-    right: u8,
+    right: usize,
 }
 
 impl Feedback {
@@ -35,10 +35,10 @@ impl Feedback {
         }
 
         // frequency hashmap to store frequencies of answer values
-        let mut frequencies: HashMap<Color, u8> = HashMap::new();
+        let mut frequencies: HashMap<Color, usize> = HashMap::new();
         // feedback parameters
-        let mut wrong: u8 = 0;
-        let mut right: u8 = 0;
+        let mut wrong: usize = 0;
+        let mut right: usize = 0;
 
         // convert answer list into frequency hashmap
         for color in answer {
@@ -65,12 +65,12 @@ impl Feedback {
     }
 
     /// Getter for wrong field (immutable access).
-    pub fn wrong(&self) -> &u8 {
+    pub fn wrong(&self) -> &usize {
         &self.wrong
     }
 
     /// Getter for right field (immutable access).
-    pub fn right(&self) -> &u8 {
+    pub fn right(&self) -> &usize {
         &self.right
     }
 }
