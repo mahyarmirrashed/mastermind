@@ -11,3 +11,4 @@ license-file = "LICENSE"
 clap = { version = "3.2.12", features = ["derive"] }
 colored = "2.0.0"
 itertools = "0.10.3"
+termion = "1.5.6"
