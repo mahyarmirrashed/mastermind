@@ -29,15 +29,14 @@ fn main() {
     let args = Args::parse();
 
     println!("Number of turns: {}.", args.turns);
-    println!("{}", "I am red!".red());
 
-    let guess = [
+    let guess = vec![
         ColorPeg::Blue,
         ColorPeg::Yellow,
         ColorPeg::Red,
         ColorPeg::Magenta,
     ];
-    let answer = [
+    let answer = vec![
         ColorPeg::Blue,
         ColorPeg::Green,
         ColorPeg::Magenta,
