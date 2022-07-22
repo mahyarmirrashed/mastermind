@@ -1,8 +1,13 @@
-use std::collections::HashMap;
+use colored::Colorize;
+use core::fmt;
+use std::{collections::HashMap, fmt::Display};
+
+/// Color code pegs for hole guessing (will be colored)
+const COLOR_PEG: &str = "\u{25cf}";
 
 /// Subset of the standard eight ANSI colors
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
-pub enum Color {
+pub enum ColorPeg {
     Red,
     Green,
     Yellow,
@@ -10,6 +15,22 @@ pub enum Color {
     Magenta,
     Cyan,
     White,
+}
+
+impl Display for ColorPeg {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let glyph = match self {
+            Self::Red => COLOR_PEG.red(),
+            Self::Green => COLOR_PEG.green(),
+            Self::Yellow => COLOR_PEG.yellow(),
+            Self::Blue => COLOR_PEG.blue(),
+            Self::Magenta => COLOR_PEG.magenta(),
+            Self::Cyan => COLOR_PEG.cyan(),
+            Self::White => COLOR_PEG.white(),
+        };
+
+        write!(f, "{}", glyph)
+    }
 }
 
 /// Feedback provided to codebreaker by codemaker
@@ -23,7 +44,7 @@ pub struct Feedback {
 
 impl Feedback {
     /// Creates a new feedback structure based on the frequency of color code pegs in the guess and answer.
-    pub fn new(guess: &[Color], answer: &[Color]) -> Result<Feedback, &'static str> {
+    pub fn new(guess: &[ColorPeg], answer: &[ColorPeg]) -> Result<Feedback, &'static str> {
         // preconditions
         debug_assert!(guess.len() > 0);
         debug_assert!(guess.len() == answer.len());
@@ -35,19 +56,19 @@ impl Feedback {
         }
 
         // frequency hashmap to store frequencies of answer values
-        let mut frequencies: HashMap<Color, usize> = HashMap::new();
+        let mut frequencies: HashMap<ColorPeg, usize> = HashMap::new();
         // feedback parameters
         let mut wrong: usize = 0;
         let mut right: usize = 0;
 
         // convert answer list into frequency hashmap
-        for color in answer {
-            *frequencies.entry(*color).or_insert(0) += 1;
+        for color_peg in answer {
+            *frequencies.entry(*color_peg).or_insert(0) += 1;
         }
 
         // count number of incorrect color code pegs
-        for color in guess {
-            if let Some(frequency) = frequencies.get_mut(color) {
+        for color_peg in guess {
+            if let Some(frequency) = frequencies.get_mut(color_peg) {
                 *frequency -= 1;
                 wrong += 1;
             }
