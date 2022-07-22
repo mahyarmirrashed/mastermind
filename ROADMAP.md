@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Create ASCII representation of how board should look like
+- [x] Create ASCII representation of how board should look like
 - [x] Create test program with argparse for following arguments:
   - [x] Number of guesses before end of game (8..=12)
   - [x] Number of positions in guesses (4..=6)
