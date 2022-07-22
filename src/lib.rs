@@ -34,12 +34,13 @@ impl Display for ColorPeg {
 }
 
 /// Feedback provided to codebreaker by codemaker
+#[derive(Clone)]
 pub struct Feedback {
     /// Number of correct color code pegs in wrong position
-    wrong: usize,
+    pub wrong: usize,
 
     /// Number of correct color code pegs in right position
-    right: usize,
+    pub right: usize,
 }
 
 impl Feedback {
@@ -83,15 +84,5 @@ impl Feedback {
         }
 
         Ok(Feedback { wrong, right })
-    }
-
-    /// Getter for wrong field (immutable access).
-    pub fn wrong(&self) -> &usize {
-        &self.wrong
-    }
-
-    /// Getter for right field (immutable access).
-    pub fn right(&self) -> &usize {
-        &self.right
     }
 }
