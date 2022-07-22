@@ -8,3 +8,4 @@
 - [ ] Publish application to repositories
   - [ ] `dnf` and `yum` repos
   - [ ] `apt-get` and `apt` repositories
+  - [ ] Publish to RedoxOS
