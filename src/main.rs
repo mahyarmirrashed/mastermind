@@ -15,20 +15,22 @@ const FEEDBACK_PEG: &str = "\u{25c9}";
 #[clap(author, version, about)]
 struct Args {
     /// Number of color code pegs to guess each turn
-    #[clap(short, long, value_parser = clap::value_parser!(i8).range(3..=6), default_value_t = 4)]
-    pegs: i8,
+    #[clap(short, long, value_parser = clap::value_parser!(u8).range(3..=6), default_value_t = 4)]
+    pegs: usize,
 
     /// Number of turns before game ends
-    #[clap(short, long, value_parser = clap::value_parser!(i8).range(8..=12), default_value_t = 10)]
-    turns: i8,
+    #[clap(short, long, value_parser = clap::value_parser!(u8).range(8..=12), default_value_t = 10)]
+    turns: usize,
 }
 
 /// Program enters here.
 fn main() {
     // parse arguments passed to program
     let args = Args::parse();
-
-    println!("Number of turns: {}.", args.turns);
+    // create vector holding user guesses
+    let guess = vec![ColorPeg::White; args.pegs];
+    // create vector of vectors holding
+    let history = vec![ColorPeg::White; args.pegs * args.turns];
 
     let guess = vec![
         ColorPeg::Blue,
