@@ -80,8 +80,7 @@ fn main() {
         }
 
         // save guess into past history
-        let range = (guesses * pegs)..((guesses + 1) * pegs);
-        history[range].copy_from_slice(&guess);
+        history[(guesses * pegs)..((guesses + 1) * pegs)].copy_from_slice(&guess);
         // calculate feedback based on current guess
         feedback[guesses] = Feedback::new(&guess, &answer).expect("Unable to create feedback.");
 
