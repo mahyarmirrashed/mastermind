@@ -9,3 +9,5 @@
   - [ ] `dnf` and `yum` repos
   - [ ] `apt-get` and `apt` repositories
   - [ ] Publish to RedoxOS
+- [ ] Update handling of arguments once `clap` upgrades
+- [ ] Remove `#[allow(unstable_name_collisions)]` from `lib.rs` once `intersperse` is added to the standard library

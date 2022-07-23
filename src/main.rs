@@ -26,7 +26,6 @@ struct Args {
 fn main() {
     // parse arguments passed to program
     let args = Args::parse();
-    // TODO: update when clap allows `usize` as value parser argument
     let pegs = args.pegs as usize;
     let turns = args.turns as usize;
 
