@@ -75,7 +75,7 @@ fn main() {
                 Key::Left => cursor = (cursor + pegs - 1) % pegs,
                 Key::Right => cursor = (cursor + pegs + 1) % pegs,
                 Key::Char('\n') => break,
-                Key::Char('q') => return,
+                Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('d') => return,
                 _ => {}
             }
         }
