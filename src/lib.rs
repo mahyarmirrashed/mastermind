@@ -1,6 +1,11 @@
-use colored::Colorize;
 use core::fmt;
+use rand::{
+    distributions::{Distribution, Standard},
+    Rng,
+};
 use std::{collections::HashMap, fmt::Display};
+
+use termion::{color, style};
 
 /// Color code pegs for hole guessing (will be colored)
 const COLOR_PEG: &str = "\u{25cf}";
@@ -17,19 +22,74 @@ pub enum ColorPeg {
     White,
 }
 
+impl ColorPeg {
+    /// Shifts color peg down wheel.
+    pub fn down(&self) -> ColorPeg {
+        match self {
+            Self::Red => ColorPeg::Green,
+            Self::Green => ColorPeg::Yellow,
+            Self::Yellow => ColorPeg::Blue,
+            Self::Blue => ColorPeg::Magenta,
+            Self::Magenta => ColorPeg::Cyan,
+            Self::Cyan => ColorPeg::White,
+            Self::White => ColorPeg::Red,
+        }
+    }
+
+    /// Shifts color peg up wheel.
+    pub fn up(&self) -> ColorPeg {
+        match self {
+            Self::Red => ColorPeg::White,
+            Self::Green => ColorPeg::Red,
+            Self::Yellow => ColorPeg::Green,
+            Self::Blue => ColorPeg::Yellow,
+            Self::Magenta => ColorPeg::Blue,
+            Self::Cyan => ColorPeg::Magenta,
+            Self::White => ColorPeg::Cyan,
+        }
+    }
+
+    // Returns ANSI color for given peg.
+    fn color(&self) -> &'static dyn color::Color {
+        match self {
+            Self::Red => &color::Red,
+            Self::Green => &color::Green,
+            Self::Yellow => &color::Yellow,
+            Self::Blue => &color::Blue,
+            Self::Magenta => &color::Magenta,
+            Self::Cyan => &color::Cyan,
+            Self::White => &color::White,
+        }
+    }
+}
+
 impl Display for ColorPeg {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let glyph = match self {
-            Self::Red => COLOR_PEG.red(),
-            Self::Green => COLOR_PEG.green(),
-            Self::Yellow => COLOR_PEG.yellow(),
-            Self::Blue => COLOR_PEG.blue(),
-            Self::Magenta => COLOR_PEG.magenta(),
-            Self::Cyan => COLOR_PEG.cyan(),
-            Self::White => COLOR_PEG.white(),
-        };
+        write!(
+            f,
+            "{}{}{}",
+            color::Fg(self.color()),
+            COLOR_PEG,
+            style::Reset
+        )
+    }
+}
 
-        write!(f, "{}", glyph)
+impl Distribution<ColorPeg> for Standard {
+    fn sample<R>(&self, rng: &mut R) -> ColorPeg
+    where
+        R: Rng + ?Sized,
+    {
+        match rng.gen_range(0..7) {
+            0 => ColorPeg::Red,
+            1 => ColorPeg::Green,
+            2 => ColorPeg::Yellow,
+            3 => ColorPeg::Blue,
+            4 => ColorPeg::Magenta,
+            5 => ColorPeg::Cyan,
+            6 => ColorPeg::White,
+            _ => unreachable!(),
+        }
     }
 }
 
