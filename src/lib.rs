@@ -1,14 +1,19 @@
 use core::fmt;
+use itertools::Itertools;
 use rand::{
     distributions::{Distribution, Standard},
     Rng,
 };
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::HashMap, fmt::Display, iter};
 
 use termion::{color, style};
 
 /// Color code pegs for hole guessing (will be colored)
 const COLOR_PEG: &str = "\u{25cf}";
+
+/// Feedback peg for indicating correct color code peg placed in right/wrong
+/// position with black/white colors, respectively
+const FEEDBACK_PEG: &str = "\u{25c9}";
 
 /// Subset of the standard eight ANSI colors
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
@@ -144,5 +149,34 @@ impl Feedback {
         }
 
         Ok(Feedback { wrong, right })
+    }
+}
+
+impl Display for Feedback {
+    #[allow(unstable_name_collisions)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // compile right and wrong symbols
+        let right = format!(
+            "{}{}{}",
+            color::Fg(color::Black),
+            FEEDBACK_PEG,
+            style::Reset
+        );
+        let wrong = format!(
+            "{}{}{}",
+            color::Fg(color::White),
+            FEEDBACK_PEG,
+            style::Reset
+        );
+
+        // create display by chaining right and wrong values
+        let display = iter::repeat(right)
+            .take(self.right)
+            .chain(iter::repeat(wrong).take(self.wrong))
+            .intersperse(String::from("  "))
+            .collect::<String>();
+
+        // write out value to string
+        f.write_str(display.as_str())
     }
 }

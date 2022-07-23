@@ -9,10 +9,6 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use mastermind::{ColorPeg, Feedback};
 
-/// Feedback peg for indicating correct color code peg placed in right/wrong
-/// position with black/white colors, respectively
-const FEEDBACK_PEG: &str = "\u{25c9}";
-
 /// Mastermind is a game where the codebreaker tries to guess the pattern in both order and color.
 #[derive(Parser, Debug)]
 #[clap(author, version, about)]
@@ -63,8 +59,8 @@ fn main() {
 
         // print guess history along with feedback
         for i in 0..guesses {
-            let range = (i * pegs)..((i + 1) * pegs);
-            write!(stdout, "[ {} ]\r\n", &history[range].iter().join("  ")).expect("Not written.");
+            let guess = &history[(i * pegs)..((i + 1) * pegs)].iter().join("  ");
+            write!(stdout, "[ {} ] ( {} )\r\n", guess, feedback[guesses]).expect("Not written.");
         }
 
         // create vector holding user guesses
@@ -97,18 +93,4 @@ fn main() {
 
         guesses += 1;
     }
-
-    // println!(
-    //     "[{} {}]",
-    //     std::iter::repeat(FEEDBACK_PEG)
-    //         .take(feedback[0].right)
-    //         .intersperse(" ")
-    //         .collect::<String>(),
-    //     std::iter::repeat(FEEDBACK_PEG)
-    //         .take(feedback[0].wrong)
-    //         .intersperse(" ")
-    //         .collect::<String>(),
-    // );
-
-    // println!("[ {} ]", answer.iter().join("  "));
 }
