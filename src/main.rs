@@ -40,7 +40,7 @@ fn main() {
     // create vector of vectors holding
     let mut history = vec![ColorPeg::White; pegs * turns];
     // create vector holding feedback history
-    let feedback = vec![Feedback { wrong: 0, right: 0 }; turns];
+    let mut feedback = vec![Feedback { wrong: 0, right: 0 }; turns];
 
     // track number of guesses made
     let mut guesses = 0usize;
@@ -48,7 +48,7 @@ fn main() {
     // enter into raw mode terminal parsing
     let mut stdout = stdout().into_raw_mode().unwrap();
 
-    // loop all through all guesses
+    // loop all through all guesses until exhausted all turns or guessed correctly
     while guesses < turns {
         // clear entire terminal output
         write!(
@@ -87,6 +87,13 @@ fn main() {
         // save guess into past history
         let range = (guesses * pegs)..((guesses + 1) * pegs);
         history[range].copy_from_slice(&guess);
+        // calculate feedback based on current guess
+        feedback[guesses] = Feedback::new(&guess, &answer).expect("Unable to create feedback.");
+
+        // quick escape if guess was correct
+        if feedback[guesses].right == pegs {
+            break;
+        }
 
         guesses += 1;
     }
