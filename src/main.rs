@@ -1,8 +1,11 @@
 #![forbid(unsafe_code)]
 
+use std::io::{stdin, stdout, Write};
+
 use clap::Parser;
-use colored::Colorize;
 use itertools::Itertools;
+use rand::{distributions::Standard, thread_rng, Rng};
+use termion::{event::Key, input::TermRead};
 
 use mastermind::{ColorPeg, Feedback};
 
@@ -16,50 +19,69 @@ const FEEDBACK_PEG: &str = "\u{25c9}";
 struct Args {
     /// Number of color code pegs to guess each turn
     #[clap(short, long, value_parser = clap::value_parser!(u8).range(3..=6), default_value_t = 4)]
-    pegs: usize,
+    pegs: u8,
 
     /// Number of turns before game ends
     #[clap(short, long, value_parser = clap::value_parser!(u8).range(8..=12), default_value_t = 10)]
-    turns: usize,
+    turns: u8,
 }
 
 /// Program enters here.
 fn main() {
     // parse arguments passed to program
     let args = Args::parse();
+    // TODO: update when clap allows `usize` as value parser argument
+    let pegs = args.pegs as usize;
+    let turns = args.turns as usize;
+
+    // generate answer that needs to be guessed
+    let answer: Vec<ColorPeg> = thread_rng().sample_iter(Standard).take(pegs).collect();
+
     // create vector holding user guesses
-    let guess = vec![ColorPeg::White; args.pegs];
+    let mut guess = vec![ColorPeg::White; pegs];
     // create vector of vectors holding
-    let history = vec![ColorPeg::White; args.pegs * args.turns];
+    let history = vec![ColorPeg::White; pegs * turns];
+    // create vector holding feedback history
+    let feedback = vec![Feedback { wrong: 0, right: 0 }; turns];
 
-    let guess = vec![
-        ColorPeg::Blue,
-        ColorPeg::Yellow,
-        ColorPeg::Red,
-        ColorPeg::Magenta,
-    ];
-    let answer = vec![
-        ColorPeg::Blue,
-        ColorPeg::Green,
-        ColorPeg::Magenta,
-        ColorPeg::Red,
-    ];
+    // track number of guesses made
+    let mut guesses = 0;
+    // track current peg position
+    let mut cursor = 0;
 
-    let feedback = Feedback::new(&guess, &answer).unwrap();
+    // loop all through all guesses
+    while guesses < args.turns {
+        // clear entire terminal output
+        print!("{}{}", termion::clear::All, termion::cursor::Goto(1, 1));
+        // flush output
+        stdout().flush().expect("Unable to flush standard output!");
+        // grab inputs from stdin
+        for chr in stdin().keys() {
+            match chr.unwrap() {
+                Key::Up => guess[cursor] = guess[cursor].up(),
+                Key::Down => guess[cursor] = guess[cursor].down(),
+                Key::Left => cursor = (cursor + pegs - 1) % pegs,
+                Key::Right => cursor = (cursor + pegs + 1) % pegs,
+                Key::Char('\n') => break,
+                Key::Char('q') => return,
+                _ => {}
+            }
+        }
+
+        guesses += 1;
+    }
 
     println!(
         "[{} {}]",
         std::iter::repeat(FEEDBACK_PEG)
-            .take(*feedback.right())
+            .take(feedback[0].right)
             .intersperse(" ")
-            .collect::<String>()
-            .black(),
+            .collect::<String>(),
         std::iter::repeat(FEEDBACK_PEG)
-            .take(*feedback.wrong())
+            .take(feedback[0].wrong)
             .intersperse(" ")
-            .collect::<String>()
-            .white(),
+            .collect::<String>(),
     );
 
-    println!("[{}]", answer.iter().join(" "));
+    println!("[ {} ]", answer.iter().join("  "));
 }
