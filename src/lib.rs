@@ -177,6 +177,6 @@ impl Display for Feedback {
             .collect::<String>();
 
         // write out value to string
-        f.write_str(display.as_str())
+        write!(f, "{}", display)
     }
 }
