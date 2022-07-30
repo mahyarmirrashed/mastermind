@@ -4,7 +4,7 @@ use std::io::{stdin, stdout, Write};
 
 use clap::Parser;
 use itertools::Itertools;
-use rand::{distributions::Standard, thread_rng, Rng};
+use rand::{distributions, Rng};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use mastermind::{ColorPeg, Feedback};
@@ -17,63 +17,61 @@ struct Args {
     #[clap(short, long, value_parser = clap::value_parser!(u8).range(3..=6), default_value_t = 4)]
     pegs: u8,
 
-    /// Number of turns before game ends
+    /// Number of guesses before game ends
     #[clap(short, long, value_parser = clap::value_parser!(u8).range(8..=12), default_value_t = 10)]
-    turns: u8,
+    guesses: u8,
 }
 
-/// Program enters here.
+/// Program enters here. Main logic is performed here until game completes.
 fn main() {
-    // parse arguments passed to program
+    // parse arguments pass to program
     let args = Args::parse();
+    // XXX: https://github.com/clap-rs/clap/pull/3895
     let pegs = args.pegs as usize;
-    let turns = args.turns as usize;
+    let guesses = args.guesses as usize;
 
-    // generate answer that needs to be guessed
-    let answer: Vec<ColorPeg> = thread_rng().sample_iter(Standard).take(pegs).collect();
+    // generate code (answer) needing to be guessed by player
+    let answer: Vec<ColorPeg> = rand::thread_rng()
+        .sample_iter(distributions::Standard)
+        .take(pegs)
+        .collect();
 
-    // create vector of vectors holding
-    let mut history = vec![ColorPeg::White; pegs * turns];
-    // create vector holding feedback history
-    let mut feedback = vec![Feedback { wrong: 0, right: 0 }; turns];
+    // track guess history and guess count
+    let mut guess_history = vec![ColorPeg::White; pegs * guesses];
+    let mut guess_count = 0;
 
-    // track number of guesses made
-    let mut guesses = 0usize;
+    // continue until player guesses correctly or runs out of guesses
+    while guess_count < guesses {
+        // display guess history to user
+        display(&guess_history, &answer, pegs, guess_count);
 
-    // loop all through all guesses until exhausted all turns or guessed correctly
-    while guesses < turns {
-        // display history to user
-        display(&history, &answer, pegs, guesses);
-
-        // create vector holding user guesses
+        // track current player guess and cursor location
         let mut guess = vec![ColorPeg::White; pegs];
-        // track current peg position
-        let mut cursor = 0;
-        // grab inputs from stdin
+        let mut guess_cursor = 0;
+
+        // process based on keystroke
         for chr in stdin().keys() {
             match chr.unwrap() {
-                Key::Up => guess[cursor] = guess[cursor].up(),
-                Key::Down => guess[cursor] = guess[cursor].down(),
-                Key::Left => cursor = (cursor + pegs - 1) % pegs,
-                Key::Right => cursor = (cursor + pegs + 1) % pegs,
+                Key::Up => guess[guess_cursor] = guess[guess_cursor].up(),
+                Key::Down => guess[guess_cursor] = guess[guess_cursor].down(),
+                Key::Left => guess_cursor = (guess_cursor + pegs - 1) % pegs,
+                Key::Right => guess_cursor = (guess_cursor + pegs + 1) % pegs,
                 Key::Char('\n') => break,
                 Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('d') => return,
                 _ => {}
             }
         }
 
-        // save guess into past history
-        let offset = guesses * pegs;
-        history[offset..(offset + guess.len())].copy_from_slice(&guess);
-        // calculate feedback based on current guess
-        feedback[guesses] = Feedback::new(&guess, &answer).expect("Unable to create feedback.");
+        // save guess into guess history
+        let offset = guess_count * pegs;
+        guess_history[offset..offset + guess.len()].copy_from_slice(&guess);
 
         // quick escape if guess was correct
-        if feedback[guesses].right == pegs {
+        if Feedback::new(&guess, &answer).unwrap().right == pegs {
             break;
+        } else {
+            guess_count += 1;
         }
-
-        guesses += 1;
     }
 }
 
@@ -90,7 +88,7 @@ fn display(history: &Vec<ColorPeg>, answer: &Vec<ColorPeg>, pegs: usize, guesses
         termion::cursor::Goto(1, 1)
     )
     .expect("Not written.");
-    // flush output
+    // flush output, clearing terminal is often buffered
     stdout.flush().expect("Unable to flush standard output!");
 
     // print guess history along with feedback
