@@ -49,6 +49,10 @@ fn main() {
 
     // continue until player guesses correctly or runs out of guesses
     while guess_count < guesses {
+        // track current player guess and cursor location
+        let mut guess = vec![ColorPeg::White; pegs];
+        let mut guess_cursor = 0;
+
         // display guess history to user
         display_history(
             guess_history[..guess_count * pegs].chunks(pegs),
@@ -58,10 +62,8 @@ fn main() {
 
         // print empty line before printing current guess
         println!();
-
-        // track current player guess and cursor location
-        let mut guess = vec![ColorPeg::White; pegs];
-        let mut guess_cursor = 0;
+        // display current guess to user
+        display_guess(&guess, &mut stdout);
 
         // process based on keystroke
         for chr in stdin().keys() {
@@ -137,8 +139,7 @@ fn display_history(
     for (i, guess) in history.enumerate() {
         write!(
             stdout,
-            "Guess #{:0>2}: [ {} ] ( {} )\r\n",
-            i,
+            "Guess #{i:0>2}: [ {} ] ( {} )\r\n",
             guess.iter().join("  "),
             Feedback::new(guess, answer).unwrap_or_default()
         )
