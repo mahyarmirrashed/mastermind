@@ -101,7 +101,7 @@ impl Distribution<ColorPeg> for Standard {
 }
 
 /// Feedback provided to codebreaker by codemaker
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Feedback {
     /// Number of correct color code pegs in wrong position
     pub wrong: usize,

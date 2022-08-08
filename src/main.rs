@@ -140,7 +140,7 @@ fn display_history(
             "Guess #{:0>2}: [ {} ] ( {} )\r\n",
             i,
             guess.iter().join("  "),
-            Feedback::new(guess, answer).unwrap_or(Feedback { wrong: 0, right: 0 })
+            Feedback::new(guess, answer).unwrap_or_default()
         )
         .expect("Not written.");
     }
