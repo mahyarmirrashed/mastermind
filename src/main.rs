@@ -1,11 +1,15 @@
 #![forbid(unsafe_code)]
 
-use std::io::{stdin, stdout, Write};
+use std::io::{stdin, stdout, Stdout, Write};
 
 use clap::Parser;
 use itertools::Itertools;
 use rand::{distributions, Rng};
-use termion::{event::Key, input::TermRead, raw::IntoRawMode};
+use termion::{
+    event::Key,
+    input::TermRead,
+    raw::{IntoRawMode, RawTerminal},
+};
 
 use mastermind::{ColorPeg, Feedback};
 
@@ -40,10 +44,17 @@ fn main() {
     let mut guess_history = vec![ColorPeg::White; pegs * guesses];
     let mut guess_count = 0;
 
+    // create raw mode standard output
+    let mut stdout = stdout().into_raw_mode().unwrap();
+
     // continue until player guesses correctly or runs out of guesses
     while guess_count < guesses {
         // display guess history to user
-        display(guess_history[..guess_count * pegs].chunks(pegs), &answer);
+        display(
+            guess_history[..guess_count * pegs].chunks(pegs),
+            &answer,
+            &mut stdout,
+        );
 
         // track current player guess and cursor location
         let mut guess = vec![ColorPeg::White; pegs];
@@ -76,10 +87,11 @@ fn main() {
 }
 
 /// Display guess history to user.
-fn display(history: std::slice::Chunks<ColorPeg>, answer: &[ColorPeg]) {
-    // create raw mode standard output
-    let mut stdout = stdout().into_raw_mode().unwrap();
-
+fn display(
+    history: std::slice::Chunks<ColorPeg>,
+    answer: &[ColorPeg],
+    stdout: &mut RawTerminal<Stdout>,
+) {
     // clear terminal output and place cursor in (1,1)
     write!(
         stdout,
