@@ -91,6 +91,15 @@ fn main() {
 
         guess_count += 1;
     }
+
+    // display output based on win or loss
+    if guess_count == guesses {
+        // loss
+        println!("You lose!");
+    } else {
+        // win
+        println!("You win!");
+    }
 }
 
 /// Display current guess to user.
