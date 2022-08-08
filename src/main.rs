@@ -43,7 +43,7 @@ fn main() {
     // continue until player guesses correctly or runs out of guesses
     while guess_count < guesses {
         // display guess history to user
-        display(&guess_history, &answer, pegs, guess_count);
+        display(guess_history[..guess_count * pegs].chunks(pegs), &answer);
 
         // track current player guess and cursor location
         let mut guess = vec![ColorPeg::White; pegs];
@@ -57,7 +57,7 @@ fn main() {
                 Key::Left => guess_cursor = (guess_cursor + pegs - 1) % pegs,
                 Key::Right => guess_cursor = (guess_cursor + pegs + 1) % pegs,
                 Key::Char('\n') => break,
-                Key::Char('q') | Key::Ctrl('c') | Key::Ctrl('d') => return,
+                Key::Char('q') | Key::Ctrl('c' | 'd') => return,
                 _ => {}
             }
         }
@@ -69,14 +69,14 @@ fn main() {
         // quick escape if guess was correct
         if Feedback::new(&guess, &answer).unwrap().right == pegs {
             break;
-        } else {
-            guess_count += 1;
         }
+
+        guess_count += 1;
     }
 }
 
 /// Display guess history to user.
-fn display(history: &Vec<ColorPeg>, answer: &Vec<ColorPeg>, pegs: usize, guesses: usize) {
+fn display(history: std::slice::Chunks<ColorPeg>, answer: &[ColorPeg]) {
     // create raw mode standard output
     let mut stdout = stdout().into_raw_mode().unwrap();
 
@@ -92,12 +92,12 @@ fn display(history: &Vec<ColorPeg>, answer: &Vec<ColorPeg>, pegs: usize, guesses
     stdout.flush().expect("Unable to flush standard output!");
 
     // print guess history along with feedback
-    for guess in history[..guesses * pegs].chunks(pegs) {
+    for guess in history {
         write!(
             stdout,
             "[ {} ] ( {} )\r\n",
             guess.iter().join("  "),
-            Feedback::new(&guess, &answer).unwrap_or(Feedback { wrong: 0, right: 0 })
+            Feedback::new(guess, answer).unwrap_or(Feedback { wrong: 0, right: 0 })
         )
         .expect("Not written.");
     }

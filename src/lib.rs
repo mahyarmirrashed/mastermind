@@ -29,6 +29,7 @@ pub enum ColorPeg {
 
 impl ColorPeg {
     /// Shifts color peg down wheel.
+    #[must_use]
     pub fn down(&self) -> ColorPeg {
         match self {
             Self::Red => ColorPeg::Green,
@@ -42,6 +43,7 @@ impl ColorPeg {
     }
 
     /// Shifts color peg up wheel.
+    #[must_use]
     pub fn up(&self) -> ColorPeg {
         match self {
             Self::Red => ColorPeg::White,
@@ -55,7 +57,7 @@ impl ColorPeg {
     }
 
     // Returns ANSI color for given peg.
-    fn color(&self) -> &'static dyn color::Color {
+    fn color(self) -> &'static dyn color::Color {
         match self {
             Self::Red => &color::Red,
             Self::Green => &color::Green,
@@ -110,12 +112,17 @@ pub struct Feedback {
 
 impl Feedback {
     /// Creates a new feedback structure based on the frequency of color code pegs in the guess and answer.
+    ///
+    /// # Errors
+    ///
+    /// - Guess length is zero.
+    /// - Guess length is not equal to answer length.
     pub fn new(guess: &[ColorPeg], answer: &[ColorPeg]) -> Result<Feedback, &'static str> {
         // preconditions
-        debug_assert!(guess.len() > 0);
+        debug_assert!(!guess.is_empty());
         debug_assert!(guess.len() == answer.len());
 
-        if guess.len() == 0 {
+        if guess.is_empty() {
             return Err("Guess length was zero.");
         } else if guess.len() != answer.len() {
             return Err("Guess and answer length were not equal.");
