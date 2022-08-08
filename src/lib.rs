@@ -142,8 +142,10 @@ impl Feedback {
         // count number of incorrect color code pegs
         for color_peg in guess {
             if let Some(frequency) = frequencies.get_mut(color_peg) {
-                *frequency -= 1;
-                wrong += 1;
+                if *frequency > 0 {
+                    *frequency -= 1;
+                    wrong += 1;
+                }
             }
         }
 
