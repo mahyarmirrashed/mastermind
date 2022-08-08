@@ -53,17 +53,13 @@ fn main() {
         let mut guess = vec![ColorPeg::White; pegs];
         let mut guess_cursor = 0;
 
-        // display guess history to user
-        display_history(
+        // display terminal user interface
+        display(
             guess_history[..guess_count * pegs].chunks(pegs),
             &answer,
+            Some(&guess),
             &mut stdout,
         );
-
-        // print empty line before printing current guess
-        println!();
-        // display current guess to user
-        display_guess(&guess, &mut stdout);
 
         // process based on keystroke
         for chr in stdin().keys() {
@@ -78,8 +74,13 @@ fn main() {
                 _ => {}
             }
 
-            // display current guess to user
-            display_guess(&guess, &mut stdout);
+            // re-render terminal user interface with new guess
+            display(
+                guess_history[..guess_count * pegs].chunks(pegs),
+                &answer,
+                Some(&guess),
+                &mut stdout,
+            );
         }
 
         // save guess into guess history
@@ -104,24 +105,11 @@ fn main() {
     }
 }
 
-/// Display current guess to user.
-fn display_guess(guess: &[ColorPeg], stdout: &mut RawTerminal<Stdout>) {
-    // write out current guess to terminal
-    write!(
-        stdout,
-        "{}\r[ {} ]",
-        termion::clear::CurrentLine,
-        guess.iter().join(" ")
-    )
-    .expect("Not written.");
-    // flush output, clearing terminal is often buffered
-    stdout.flush().expect("Unable to flush standard output!");
-}
-
-/// Display guess history to user.
-fn display_history(
+/// Display terminal user interface to user.
+fn display(
     history: std::slice::Chunks<ColorPeg>,
     answer: &[ColorPeg],
+    guess: Option<&[ColorPeg]>,
     stdout: &mut RawTerminal<Stdout>,
 ) {
     // clear terminal output and place cursor in (1,1)
@@ -140,9 +128,14 @@ fn display_history(
         write!(
             stdout,
             "Guess #{i:0>2}: [ {} ] ( {} )\r\n",
-            guess.iter().join("  "),
+            guess.iter().join(" "),
             Feedback::new(guess, answer).unwrap_or_default()
         )
         .expect("Not written.");
+    }
+
+    // print guess if necessary
+    if let Some(guess) = guess {
+        write!(stdout, "\r\n[ {} ]\r\n", guess.iter().join(" ")).expect("Not written.");
     }
 }

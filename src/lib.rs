@@ -182,7 +182,7 @@ impl Display for Feedback {
         let display = iter::repeat(right)
             .take(self.right)
             .chain(iter::repeat(wrong).take(self.wrong))
-            .intersperse(String::from("  "))
+            .intersperse(String::from(" "))
             .collect::<String>();
 
         // write out value to string
