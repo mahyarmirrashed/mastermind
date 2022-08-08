@@ -104,10 +104,11 @@ fn display(
     stdout.flush().expect("Unable to flush standard output!");
 
     // print guess history along with feedback
-    for guess in history {
+    for (i, guess) in history.enumerate() {
         write!(
             stdout,
-            "[ {} ] ( {} )\r\n",
+            "Guess #{:0>2}: [ {} ] ( {} )\r\n",
+            i,
             guess.iter().join("  "),
             Feedback::new(guess, answer).unwrap_or(Feedback { wrong: 0, right: 0 })
         )
