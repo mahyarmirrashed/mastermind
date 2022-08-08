@@ -50,11 +50,14 @@ fn main() {
     // continue until player guesses correctly or runs out of guesses
     while guess_count < guesses {
         // display guess history to user
-        display(
+        display_history(
             guess_history[..guess_count * pegs].chunks(pegs),
             &answer,
             &mut stdout,
         );
+
+        // print empty line before printing current guess
+        println!();
 
         // track current player guess and cursor location
         let mut guess = vec![ColorPeg::White; pegs];
@@ -62,6 +65,7 @@ fn main() {
 
         // process based on keystroke
         for chr in stdin().keys() {
+            // handle next character from standard input
             match chr.unwrap() {
                 Key::Up => guess[guess_cursor] = guess[guess_cursor].up(),
                 Key::Down => guess[guess_cursor] = guess[guess_cursor].down(),
@@ -71,6 +75,9 @@ fn main() {
                 Key::Char('q') | Key::Ctrl('c' | 'd') => return,
                 _ => {}
             }
+
+            // display current guess to user
+            display_guess(&guess, &mut stdout);
         }
 
         // save guess into guess history
@@ -86,8 +93,22 @@ fn main() {
     }
 }
 
+/// Display current guess to user.
+fn display_guess(guess: &[ColorPeg], stdout: &mut RawTerminal<Stdout>) {
+    // write out current guess to terminal
+    write!(
+        stdout,
+        "{}\r[ {} ]",
+        termion::clear::CurrentLine,
+        guess.iter().join(" ")
+    )
+    .expect("Not written.");
+    // flush output, clearing terminal is often buffered
+    stdout.flush().expect("Unable to flush standard output!");
+}
+
 /// Display guess history to user.
-fn display(
+fn display_history(
     history: std::slice::Chunks<ColorPeg>,
     answer: &[ColorPeg],
     stdout: &mut RawTerminal<Stdout>,
