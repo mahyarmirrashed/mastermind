@@ -16,4 +16,4 @@
   - [x] Show in real-time where cursor is pointing
   - [x] Show current colors selected for next guess
   - [ ] Show user-prompt dialog about key bindings registered for the game
-- [ ] Add instructions on how to play Mastermind
+- [x] Add instructions on how to play Mastermind

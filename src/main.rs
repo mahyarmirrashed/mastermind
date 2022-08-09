@@ -13,8 +13,22 @@ use termion::{
 
 use mastermind::{ColorPeg, Feedback};
 
-/// Mastermind is a game where the codebreaker tries to guess the pattern in both order and color.
 #[derive(Parser, Debug)]
+/// Mastermind is a game where the codebreaker tries to guess the pattern in
+/// both order and color.
+///
+/// To play Mastermind, the codemaster (this program) will generate a sequence
+/// of randomly colored pegs. This sequence will be "the code". There can be
+/// multiple pegs of the same color in a given code. The goal of the codebreaker
+/// (you) is to guess the correct color and position of every peg in the
+/// codemaster's code. If you can achieve this task in the number of guesses
+/// required, you win! Feedback is provided at the end of each guess. A white
+/// feedback peg indicates a peg in your guess is of the right color but, wrong
+/// position. Similarly, a black feedback peg indicates a peg in your guess is
+/// of the right color and right position.
+///
+/// You can learn more about Mastermind here:
+/// https://www.wikiwand.com/en/Mastermind_(board_game)
 #[clap(author, version, about)]
 struct Args {
     /// Number of color code pegs to guess each turn
