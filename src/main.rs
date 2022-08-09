@@ -103,12 +103,13 @@ fn main() {
         let offset = guess_count * pegs;
         guess_history[offset..offset + guess.len()].copy_from_slice(&guess);
 
+        // increase guess count
+        guess_count += 1;
+
         // quick escape if guess was correct
         if Feedback::new(&guess, &answer).unwrap().right == pegs {
             break;
         }
-
-        guess_count += 1;
     }
 
     // display final game output without guess prompt
