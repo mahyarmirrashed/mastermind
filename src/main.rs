@@ -122,10 +122,8 @@ fn main() {
 
     // display output based on win or loss
     if guess_count == guesses {
-        // loss
         write!(stdout, "Sorry, you lost!\r\n").expect("Not written.");
     } else {
-        // win
         write!(stdout, "Congratulations, you won!\r\n").expect("Not written.");
     }
 }
