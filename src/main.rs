@@ -13,6 +13,16 @@ use termion::{
 
 use mastermind::{ColorPeg, Feedback};
 
+const INSTRUCTIONS: &'static str = "╔══════════════════════════════════╗\r\n\
+                                    ╟----------- Mastermind -----------╢\r\n\
+                                    ╠══════════════════════════════════╣\r\n\
+                                    ║ ◀ ▶ | move cursor left and right ║\r\n\
+                                    ║ ▼ ▲ | shuffle through colors     ║\r\n\
+                                    ║ ↵   | submit guess               ║\r\n\
+                                    ║ q   | quit the game              ║\r\n\
+                                    ╚══════════════════════════════════╝\r\n\
+                                   ";
+
 #[derive(Parser, Debug)]
 /// Mastermind is a game where the codebreaker tries to guess the pattern in
 /// both order and color.
@@ -137,12 +147,13 @@ fn display(
     guess_cursor: Option<usize>,
     stdout: &mut RawTerminal<Stdout>,
 ) {
-    // clear terminal output and place cursor in (1, 1)
+    // clear terminal output, place cursor in (1, 1), and print instructions
     write!(
         stdout,
-        "{}{}",
+        "{}{}{}\r\n",
         termion::clear::All,
-        termion::cursor::Goto(1, 1)
+        termion::cursor::Goto(1, 1),
+        INSTRUCTIONS
     )
     .expect("Not written.");
     // flush output, clearing terminal is often buffered
