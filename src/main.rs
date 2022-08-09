@@ -58,6 +58,7 @@ fn main() {
             guess_history[..guess_count * pegs].chunks(pegs),
             &answer,
             Some(&guess),
+            Some(guess_cursor),
             &mut stdout,
         );
 
@@ -79,6 +80,7 @@ fn main() {
                 guess_history[..guess_count * pegs].chunks(pegs),
                 &answer,
                 Some(&guess),
+                Some(guess_cursor),
                 &mut stdout,
             );
         }
@@ -96,7 +98,7 @@ fn main() {
     }
 
     // display final game output without guess prompt
-    display(guess_history.chunks(pegs), &answer, None, &mut stdout);
+    display(guess_history.chunks(pegs), &answer, None, None, &mut stdout);
 
     // display output based on win or loss
     if guess_count == guesses {
@@ -113,9 +115,10 @@ fn display(
     history: std::slice::Chunks<ColorPeg>,
     answer: &[ColorPeg],
     guess: Option<&[ColorPeg]>,
+    guess_cursor: Option<usize>,
     stdout: &mut RawTerminal<Stdout>,
 ) {
-    // clear terminal output and place cursor in (1,1)
+    // clear terminal output and place cursor in (1, 1)
     write!(
         stdout,
         "{}{}",
@@ -126,11 +129,15 @@ fn display(
     // flush output, clearing terminal is often buffered
     stdout.flush().expect("Unable to flush standard output!");
 
+    // determine whether to include guess separator
+    let separate_guesses = history.len() != 0;
+
     // print guess history along with feedback
     for (i, guess) in history.enumerate() {
         write!(
             stdout,
-            "Guess #{i:0>2}: [ {} ] ( {} )\r\n",
+            "Guess #{:0>2}: [ {} ] ( {} )\r\n",
+            i + 1,
             guess.iter().join(" "),
             Feedback::new(guess, answer).unwrap_or_default()
         )
@@ -138,10 +145,17 @@ fn display(
     }
 
     // print newline to separate from guesses
-    write!(stdout, "\r\n").expect("Not written.");
+    if separate_guesses {
+        write!(stdout, "\r\n").expect("Not written.");
+    }
 
-    // print guess if necessary
+    // print current guess, if necessary
     if let Some(guess) = guess {
+        // current guess selected by user
         write!(stdout, "[ {} ]\r\n", guess.iter().join(" ")).expect("Not written.");
+        // current cursor location on guess
+        let mut cursor = vec![' '; guess.len()];
+        cursor[guess_cursor.unwrap_or_default()] = '^';
+        write!(stdout, "  {}  \r\n", cursor.iter().join(" ")).expect("Not written.");
     }
 }
