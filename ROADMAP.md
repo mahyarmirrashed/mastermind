@@ -17,3 +17,6 @@
   - [x] Show current colors selected for next guess
   - [ ] Show user-prompt dialog about key bindings registered for the game
 - [x] Add instructions on how to play Mastermind
+- [ ] Add prompt on how to use controls during game
+- [ ] Add option for colorblind people (maybe shapes?)
+- [ ] Create manual page for Linux users
