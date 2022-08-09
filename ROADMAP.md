@@ -10,9 +10,9 @@
   - [ ] `apt-get` and `apt` repositories
   - [ ] Publish to RedoxOS
 - [ ] Update handling of arguments once `clap` upgrades
-- [ ] Remove `#[allow(unstable_name_collisions)]` from `lib.rs` once `intersperse` is added to the standard library
+- [x] Remove `#[allow(unstable_name_collisions)]` from `lib.rs` once `intersperse` is added to the standard library
 - [ ] Optimize codebase to remove unnecessary computation and printing
 - [ ] Improve user interface
-  - [ ] Show in real-time where cursor is pointing
-  - [ ] Show current colors selected for next guess
+  - [x] Show in real-time where cursor is pointing
+  - [x] Show current colors selected for next guess
   - [ ] Show user-prompt dialog about key bindings registered for the game
