@@ -95,13 +95,16 @@ fn main() {
         guess_count += 1;
     }
 
+    // display final game output without guess prompt
+    display(guess_history.chunks(pegs), &answer, None, &mut stdout);
+
     // display output based on win or loss
     if guess_count == guesses {
         // loss
-        println!("You lose!");
+        write!(stdout, "Sorry, you lost!\r\n").expect("Not written.");
     } else {
         // win
-        println!("You win!");
+        write!(stdout, "Congratulations, you won!\r\n").expect("Not written.");
     }
 }
 
@@ -134,8 +137,11 @@ fn display(
         .expect("Not written.");
     }
 
+    // print newline to separate from guesses
+    write!(stdout, "\r\n").expect("Not written.");
+
     // print guess if necessary
     if let Some(guess) = guess {
-        write!(stdout, "\r\n[ {} ]\r\n", guess.iter().join(" ")).expect("Not written.");
+        write!(stdout, "[ {} ]\r\n", guess.iter().join(" ")).expect("Not written.");
     }
 }
