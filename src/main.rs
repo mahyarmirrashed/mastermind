@@ -112,7 +112,13 @@ fn main() {
     }
 
     // display final game output without guess prompt
-    display(guess_history.chunks(pegs), &answer, None, None, &mut stdout);
+    display(
+        guess_history[..guess_count * pegs].chunks(pegs),
+        &answer,
+        None,
+        None,
+        &mut stdout,
+    );
 
     // display output based on win or loss
     if guess_count == guesses {
