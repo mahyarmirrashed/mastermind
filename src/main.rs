@@ -166,7 +166,7 @@ fn display(
     for (i, guess) in history.enumerate() {
         write!(
             stdout,
-            "Guess {:0>2}: [ {} ] ( {} )\r\n",
+            "Guess {:0>2}: [ {} ] {}\r\n",
             i + 1,
             guess.iter().join(" "),
             Feedback::new(guess, answer).unwrap_or_default()
