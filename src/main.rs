@@ -13,15 +13,15 @@ use termion::{
 
 use mastermind::{ColorPeg, Feedback};
 
-const INSTRUCTIONS: &'static str = "╔══════════════════════════════════╗\r\n\
-                                    ╟----------- Mastermind -----------╢\r\n\
-                                    ╠══════════════════════════════════╣\r\n\
-                                    ║ ◀ ▶ | move cursor left and right ║\r\n\
-                                    ║ ▼ ▲ | shuffle through colors     ║\r\n\
-                                    ║ ↵   | submit guess               ║\r\n\
-                                    ║ q   | quit the game              ║\r\n\
-                                    ╚══════════════════════════════════╝\r\n\
-                                   ";
+const INSTRUCTIONS: &str = "╔══════════════════════════════════╗\r\n\
+                            ╟----------- Mastermind -----------╢\r\n\
+                            ╠══════════════════════════════════╣\r\n\
+                            ║ ◀ ▶ | move cursor left and right ║\r\n\
+                            ║ ▼ ▲ | shuffle through colors     ║\r\n\
+                            ║ ↵   | submit guess               ║\r\n\
+                            ║ q   | quit the game              ║\r\n\
+                            ╚══════════════════════════════════╝\r\n\
+                            ";
 
 #[derive(Parser, Debug)]
 /// Mastermind is a game where the codebreaker tries to guess the pattern in
@@ -37,8 +37,8 @@ const INSTRUCTIONS: &'static str = "╔═════════════�
 /// position. Similarly, a black feedback peg indicates a peg in your guess is
 /// of the right color and right position.
 ///
-/// You can learn more about Mastermind here:
-/// https://www.wikiwand.com/en/Mastermind_(board_game)
+/// You can learn more about Mastermind
+/// [here](https://www.wikiwand.com/en/Mastermind_(board_game))
 #[clap(author, version, about)]
 struct Args {
     /// Number of color code pegs to guess each turn
