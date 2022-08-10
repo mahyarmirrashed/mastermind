@@ -94,7 +94,7 @@ fn main() {
                 Key::Down => guess[guess_cursor] = guess[guess_cursor].down(),
                 Key::Left => guess_cursor = (guess_cursor + pegs - 1) % pegs,
                 Key::Right => guess_cursor = (guess_cursor + pegs + 1) % pegs,
-                Key::Char('\n') => break,
+                Key::Char('\n' | ' ') => break,
                 Key::Char('q') | Key::Ctrl('c' | 'd') => return,
                 _ => {}
             }
