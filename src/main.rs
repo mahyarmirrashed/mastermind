@@ -67,6 +67,7 @@ fn main() {
     // track guess history and guess count
     let mut guess_history = vec![ColorPeg::White; pegs * guesses];
     let mut guess_count = 0;
+    let mut won = false;
 
     // create raw mode standard output
     let mut stdout = stdout().into_raw_mode().unwrap();
@@ -118,6 +119,7 @@ fn main() {
 
         // quick escape if guess was correct
         if Feedback::new(&guess, &answer).unwrap().right == pegs {
+            won = true;
             break;
         }
     }
@@ -132,10 +134,10 @@ fn main() {
     );
 
     // display output based on win or loss
-    if guess_count == guesses {
-        write!(stdout, "Sorry, you lost!\r\n").expect("Not written.");
-    } else {
+    if won {
         write!(stdout, "Congratulations, you won!\r\n").expect("Not written.");
+    } else {
+        write!(stdout, "Sorry, you lost!\r\n").expect("Not written.");
     }
 }
 
