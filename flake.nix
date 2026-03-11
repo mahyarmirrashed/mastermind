@@ -27,6 +27,13 @@
         };
       in
       {
+        packages.default = mastermind;
+
+        apps.default = {
+          type = "app";
+          program = "${mastermind}/bin/mastermind";
+        };
+
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
           ];
