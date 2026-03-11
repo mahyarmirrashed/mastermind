@@ -34,57 +34,57 @@ pub enum ColorPeg {
 }
 
 impl ColorPeg {
-    /// Shifts color peg down wheel.
+    /// Shifts color peg down wheel (decreases number in colorblind mode).
     #[must_use]
     pub fn down(&self) -> ColorPeg {
         match self {
-            Self::Red => ColorPeg::Green,
-            Self::Green => ColorPeg::Yellow,
-            Self::Yellow => ColorPeg::Blue,
-            Self::Blue => ColorPeg::Magenta,
-            Self::Magenta => ColorPeg::Cyan,
-            Self::Cyan => ColorPeg::White,
-            Self::White => ColorPeg::Red,
-        }
-    }
-
-    /// Shifts color peg up wheel.
-    #[must_use]
-    pub fn up(&self) -> ColorPeg {
-        match self {
+            Self::White => ColorPeg::Cyan,
             Self::Red => ColorPeg::White,
             Self::Green => ColorPeg::Red,
             Self::Yellow => ColorPeg::Green,
             Self::Blue => ColorPeg::Yellow,
             Self::Magenta => ColorPeg::Blue,
             Self::Cyan => ColorPeg::Magenta,
-            Self::White => ColorPeg::Cyan,
+        }
+    }
+
+    /// Shifts color peg up wheel (increases number in colorblind mode).
+    #[must_use]
+    pub fn up(&self) -> ColorPeg {
+        match self {
+            Self::White => ColorPeg::Red,
+            Self::Red => ColorPeg::Green,
+            Self::Green => ColorPeg::Yellow,
+            Self::Yellow => ColorPeg::Blue,
+            Self::Blue => ColorPeg::Magenta,
+            Self::Magenta => ColorPeg::Cyan,
+            Self::Cyan => ColorPeg::White,
         }
     }
 
     // Returns ANSI color for given peg.
     fn color(self) -> &'static dyn color::Color {
         match self {
+            Self::White => &color::White,
             Self::Red => &color::Red,
             Self::Green => &color::Green,
             Self::Yellow => &color::Yellow,
             Self::Blue => &color::Blue,
             Self::Magenta => &color::Magenta,
             Self::Cyan => &color::Cyan,
-            Self::White => &color::White,
         }
     }
 
     /// Returns the numeric label (1–7) for colorblind mode.
     fn number(self) -> u8 {
         match self {
-            Self::Red => 1,
-            Self::Green => 2,
-            Self::Yellow => 3,
-            Self::Blue => 4,
-            Self::Magenta => 5,
-            Self::Cyan => 6,
-            Self::White => 7,
+            Self::White => 1,
+            Self::Red => 2,
+            Self::Green => 3,
+            Self::Yellow => 4,
+            Self::Blue => 5,
+            Self::Magenta => 6,
+            Self::Cyan => 7,
         }
     }
 
@@ -112,13 +112,13 @@ impl Distribution<ColorPeg> for Standard {
         R: Rng + ?Sized,
     {
         match rng.gen_range(0..7) {
-            0 => ColorPeg::Red,
-            1 => ColorPeg::Green,
-            2 => ColorPeg::Yellow,
-            3 => ColorPeg::Blue,
-            4 => ColorPeg::Magenta,
-            5 => ColorPeg::Cyan,
-            6 => ColorPeg::White,
+            0 => ColorPeg::White,
+            1 => ColorPeg::Red,
+            2 => ColorPeg::Green,
+            3 => ColorPeg::Yellow,
+            4 => ColorPeg::Blue,
+            5 => ColorPeg::Magenta,
+            6 => ColorPeg::Cyan,
             _ => unreachable!(),
         }
     }
