@@ -54,7 +54,6 @@ struct Args {
 fn main() {
     // parse arguments pass to program
     let args = Args::parse();
-    // XXX: https://github.com/clap-rs/clap/pull/3895
     let pegs = args.pegs as usize;
     let guesses = args.guesses as usize;
 
