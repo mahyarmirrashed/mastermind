@@ -15,6 +15,12 @@ const COLOR_PEG: &str = "\u{25cf}";
 /// position with black/white colors, respectively
 const FEEDBACK_PEG: &str = "\u{25c9}";
 
+/// Feedback character for correct position in colorblind mode
+const FEEDBACK_RIGHT: char = '#';
+
+/// Feedback character for correct color, wrong position in colorblind mode
+const FEEDBACK_WRONG: char = 'O';
+
 /// Subset of the standard eight ANSI colors
 #[derive(Clone, Copy, Eq, Hash, PartialEq)]
 pub enum ColorPeg {
@@ -68,6 +74,24 @@ impl ColorPeg {
             Self::White => &color::White,
         }
     }
+
+    /// Returns the numeric label (1–7) for colorblind mode.
+    fn number(self) -> u8 {
+        match self {
+            Self::Red => 1,
+            Self::Green => 2,
+            Self::Yellow => 3,
+            Self::Blue => 4,
+            Self::Magenta => 5,
+            Self::Cyan => 6,
+            Self::White => 7,
+        }
+    }
+
+    /// Returns a display wrapper that renders according to the given mode.
+    pub fn display(&self, colorblind: bool) -> ColorPegDisplay<'_> {
+        ColorPegDisplay { peg: self, colorblind }
+    }
 }
 
 impl Display for ColorPeg {
@@ -96,6 +120,22 @@ impl Distribution<ColorPeg> for Standard {
             5 => ColorPeg::Cyan,
             6 => ColorPeg::White,
             _ => unreachable!(),
+        }
+    }
+}
+
+/// Display wrapper for `ColorPeg` that respects colorblind mode.
+pub struct ColorPegDisplay<'a> {
+    peg: &'a ColorPeg,
+    colorblind: bool,
+}
+
+impl Display for ColorPegDisplay<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.colorblind {
+            write!(f, "{}", self.peg.number())
+        } else {
+            write!(f, "{}", self.peg)
         }
     }
 }
@@ -159,33 +199,56 @@ impl Feedback {
 
         Ok(Feedback { wrong, right })
     }
+
+    /// Returns a display wrapper that renders according to the given mode.
+    pub fn display(&self, colorblind: bool) -> FeedbackDisplay<'_> {
+        FeedbackDisplay { feedback: self, colorblind }
+    }
 }
 
 impl Display for Feedback {
     #[allow(unstable_name_collisions)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // compile right and wrong symbols
-        let right = format!(
-            "{}{}{}",
-            color::Fg(color::Black),
-            FEEDBACK_PEG,
-            style::Reset
-        );
-        let wrong = format!(
-            "{}{}{}",
-            color::Fg(color::White),
-            FEEDBACK_PEG,
-            style::Reset
-        );
+        write!(f, "{}", self.display(false))
+    }
+}
 
-        // create display by chaining right and wrong values
-        let display = iter::repeat(right)
-            .take(self.right)
-            .chain(iter::repeat(wrong).take(self.wrong))
-            .intersperse(String::from(" "))
-            .collect::<String>();
+/// Display wrapper for `Feedback` that respects colorblind mode.
+pub struct FeedbackDisplay<'a> {
+    feedback: &'a Feedback,
+    colorblind: bool,
+}
 
-        // write out value to string
-        write!(f, "{}", display)
+impl Display for FeedbackDisplay<'_> {
+    #[allow(unstable_name_collisions)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.colorblind {
+            let display = iter::repeat(FEEDBACK_RIGHT)
+                .take(self.feedback.right)
+                .chain(iter::repeat(FEEDBACK_WRONG).take(self.feedback.wrong))
+                .map(|c| c.to_string())
+                .intersperse(String::from(" "))
+                .collect::<String>();
+            write!(f, "{}", display)
+        } else {
+            let right = format!(
+                "{}{}{}",
+                color::Fg(color::Black),
+                FEEDBACK_PEG,
+                style::Reset
+            );
+            let wrong = format!(
+                "{}{}{}",
+                color::Fg(color::White),
+                FEEDBACK_PEG,
+                style::Reset
+            );
+            let display = iter::repeat(right)
+                .take(self.feedback.right)
+                .chain(iter::repeat(wrong).take(self.feedback.wrong))
+                .intersperse(String::from(" "))
+                .collect::<String>();
+            write!(f, "{}", display)
+        }
     }
 }

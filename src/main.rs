@@ -23,6 +23,7 @@ const INSTRUCTIONS: &str = "╔════════════════�
                             ╚══════════════════════════════════╝\r\n\
                             ";
 
+
 #[derive(Parser, Debug)]
 /// Mastermind is a game where the codebreaker tries to guess the pattern in
 /// both order and color.
@@ -48,6 +49,11 @@ struct Args {
     /// Number of guesses before game ends
     #[clap(short, long, value_parser = clap::value_parser!(u8).range(8..=12), default_value_t = 10)]
     guesses: u8,
+
+    /// Replace colors with numbers and feedback symbols for colorblind accessibility.
+    /// Also activated by setting the NO_COLOR environment variable.
+    #[clap(short = 'c', long)]
+    colorblind: bool,
 }
 
 /// Program enters here. Main logic is performed here until game completes.
@@ -56,6 +62,7 @@ fn main() {
     let args = Args::parse();
     let pegs = args.pegs as usize;
     let guesses = args.guesses as usize;
+    let colorblind = args.colorblind || std::env::var_os("NO_COLOR").is_some();
 
     // generate code (answer) needing to be guessed by player
     let answer: Vec<ColorPeg> = rand::thread_rng()
@@ -83,6 +90,7 @@ fn main() {
             &answer,
             Some(&guess),
             Some(guess_cursor),
+            colorblind,
             &mut stdout,
         );
 
@@ -105,6 +113,7 @@ fn main() {
                 &answer,
                 Some(&guess),
                 Some(guess_cursor),
+                colorblind,
                 &mut stdout,
             );
         }
@@ -129,6 +138,7 @@ fn main() {
         &answer,
         None,
         None,
+        colorblind,
         &mut stdout,
     );
 
@@ -146,6 +156,7 @@ fn display(
     answer: &[ColorPeg],
     guess: Option<&[ColorPeg]>,
     guess_cursor: Option<usize>,
+    colorblind: bool,
     stdout: &mut RawTerminal<Stdout>,
 ) {
     // clear terminal output, place cursor in (1, 1), and print instructions
@@ -164,13 +175,15 @@ fn display(
     let separate_guesses = history.len() != 0;
 
     // print guess history along with feedback
-    for (i, guess) in history.enumerate() {
+    for (i, row) in history.enumerate() {
         write!(
             stdout,
             "Guess {:0>2}: [ {} ] {}\r\n",
             i + 1,
-            guess.iter().join(" "),
-            Feedback::new(guess, answer).unwrap_or_default()
+            row.iter().map(|p| p.display(colorblind)).join(" "),
+            Feedback::new(row, answer)
+                .unwrap_or_default()
+                .display(colorblind)
         )
         .expect("Not written.");
     }
@@ -183,7 +196,12 @@ fn display(
     // print current guess, if necessary
     if let Some(guess) = guess {
         // current guess selected by user
-        write!(stdout, "[ {} ]\r\n", guess.iter().join(" ")).expect("Not written.");
+        write!(
+            stdout,
+            "[ {} ]\r\n",
+            guess.iter().map(|p| p.display(colorblind)).join(" ")
+        )
+        .expect("Not written.");
         // current cursor location on guess
         let mut cursor = vec![' '; guess.len()];
         cursor[guess_cursor.unwrap_or_default()] = '^';
