@@ -24,6 +24,16 @@
           version = cargoToml.package.version;
           src = ./.;
           cargoLock.lockFile = ./Cargo.lock;
+
+          nativeBuildInputs = with pkgs; [
+            installShellFiles
+            scdoc
+          ];
+
+          postInstall = ''
+            scdoc < doc/mastermind.6.scd > mastermind.6
+            installManPage mastermind.6
+          '';
         };
       in
       {
