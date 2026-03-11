@@ -16,6 +16,15 @@
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
+        cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
+
+        mastermind = pkgs.rustPlatform.buildRustPackage {
+          pname = "mastermind";
+          version = cargoToml.package.version;
+          src = ./.;
+          cargoLock.lockFile = ./Cargo.lock;
+        };
       in
       {
         devShells.default = pkgs.mkShell {
