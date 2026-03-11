@@ -57,10 +57,10 @@ impl Game {
 
             for chr in stdin().keys() {
                 match chr.unwrap() {
-                    Key::Up => guess[cursor] = guess[cursor].up(),
-                    Key::Down => guess[cursor] = guess[cursor].down(),
-                    Key::Left => cursor = (cursor + self.pegs - 1) % self.pegs,
-                    Key::Right => cursor = (cursor + self.pegs + 1) % self.pegs,
+                    Key::Up | Key::Char('k') => guess[cursor] = guess[cursor].up(),
+                    Key::Down | Key::Char('j') => guess[cursor] = guess[cursor].down(),
+                    Key::Left | Key::Char('h') => cursor = (cursor + self.pegs - 1) % self.pegs,
+                    Key::Right | Key::Char('l') => cursor = (cursor + self.pegs + 1) % self.pegs,
                     Key::Char('\n' | ' ') => break,
                     Key::Char('q') | Key::Ctrl('c' | 'd') => return,
                     _ => {}
